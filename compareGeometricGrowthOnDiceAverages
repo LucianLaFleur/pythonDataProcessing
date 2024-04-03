@@ -1,0 +1,59 @@
+import math
+
+def get_dice_splat_from_damage(avg_dam):
+    valid_dice = ["d4", "d6", "d8", "d10", "d12"]
+    valid_dice_dict = {
+    "d4": 2.5,
+    "d6": 3.5,
+    "d8": 4.5,
+    "d10": 5.5,
+    "d12": 6.5,
+    }
+    all_dice_out_arr = []
+    for die_val_str in valid_dice:
+        die_val_int = valid_dice_dict[die_val_str]
+        num_dice = int(avg_dam / die_val_int)
+        remainder = math.floor(avg_dam % die_val_int)
+        result = f"{num_dice}{die_val_str}+{remainder}"
+        all_dice_out_arr.append(result)
+    return all_dice_out_arr
+
+# Initialize variables
+first_number = 0.14
+# growth_ratios = [1.4, 1.44, 1.48, 1.51, 1.55, 1.6, 1.65]
+growth_ratios = [1.4, 1.44, 1.5]
+num_terms = 6
+
+for growth_ratio in growth_ratios:
+    result_array = [round(first_number * (growth_ratio ** (n - 1)), 3) for n in range(1, num_terms + 1)]
+    print(f"~" *22)
+    print(f"[+] At {growth_ratio} \n ------------------------------")
+    print(f"ratios are {result_array}")
+    
+    print(f"from cR1's +4 to hit & 10 DPR, baseline DPR dice == ")
+    given_avg_dam_at_CR = 10
+    baseline_dam_splat = get_dice_splat_from_damage(given_avg_dam_at_CR)
+    
+    positive_buff_adjusted_arr = []
+    positive_mod_counter = len(result_array)
+    rev_idx = 0
+    for item in result_array:
+        rev_idx += 1
+        avg_damage = round(given_avg_dam_at_CR - ((result_array[(len(result_array)) - rev_idx])*given_avg_dam_at_CR), 3)
+        dam_dice_arr = get_dice_splat_from_damage(avg_damage)
+        positive_buff_adjusted_arr.append([avg_damage, dam_dice_arr])
+    for x in positive_buff_adjusted_arr:
+        print(f"At +{positive_mod_counter} Atk: {x}")
+        positive_mod_counter -= 1
+
+    print(f"At -0 ATK:   {given_avg_dam_at_CR}    {baseline_dam_splat}")
+    neg_buff_adjusted_arr = []
+    neg_mod_counter = 0
+    for buff in result_array:
+        avg_damage = round((1+buff)*given_avg_dam_at_CR, 3)
+        dam_dice_arr = get_dice_splat_from_damage(avg_damage)
+        neg_buff_adjusted_arr.append([avg_damage, dam_dice_arr])
+    for x in neg_buff_adjusted_arr:
+        neg_mod_counter += 1
+        print(f"At -{neg_mod_counter} Atk: {x}")
+
